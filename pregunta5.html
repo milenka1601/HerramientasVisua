@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>EJERCICIO NRO 5</title>
+        <script src="http://d3js.org/d3.v7.min.js"></script>
+        <script>
+            const csvUrl="https://raw.githubusercontent.com/milenka1601/HerramientasVisua/refs/heads/main/Real_Estate_Sales_2001-2022_GL.csv"
+
+      </script>
+        <style>
+        .bar {
+            fill: steelblue;
+            stroke-width: 2;
+            font-size: 5;
+        }
+        .bar:hover {
+            fill: orange;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>EJERCICIO 5</h1>
+        <h1>Gráfico de Ventas por Ciudad</h1>
+        <svg width="800" height="400"></svg>
+        <script>
+             d3.csv(csvUrl).then(data => {
+            // Convertir el "MontoVenta" a número y agrupar por "Ciudad"
+            const salesByTown = d3.rollup(
+                data,
+                v => d3.sum(v, d => +d["MontoVenta"]), // Sumar los montos de venta
+                d => d.Ciudad // Agrupar por ciudad
+            );
+            // Convertir a un array para poder usar en D3
+            const salesData = Array.from(salesByTown, ([key, value]) => ({ Ciudad: key, MontoVenta: value }));
+
+            const width = 800;
+            const height = 600;
+            const margin = { top: 20, right: 30, bottom: 40, left: 100 };
+
+            const svg = d3.select("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("style", "max-width: 100%; height: auto; font: 1px sans-serif;");;
+
+            const x = d3.scaleBand()
+                .domain(salesData.map(d => d.Ciudad))
+                .range([margin.left, width - margin.right])
+                .padding(0.05);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(salesData, d => d.MontoVenta)])
+                .nice()
+                .range([height - margin.bottom, margin.top]);                
+
+            svg.selectAll("*").remove(); // Limpiar SVG antes de dibujar
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x).tickSize(0))
+                .selectAll("text") // Selecciona todos los elementos de texto del eje X
+                .attr("transform", "rotate(90)") // Rota los textos -45 grados
+                .attr("text-anchor", "end") // Ajusta el anclaje del texto
+                .attr("dx", "-0.5em") // Desplaza el texto ligeramente
+                .attr("dy", "0.5em"); // Desplaza el texto ligeramente hacia abajo
+            svg.append("g")
+                .attr("transform", `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y));
+
+            svg.selectAll(".bar")
+                .data(salesData)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.Ciudad))
+                .attr("y", d => y(d.MontoVenta))
+                .attr("height", d => y(0) - y(d.MontoVenta))
+                .attr("width", x.bandwidth());
+                
+        }).catch(error => {
+            console.error('Error al cargar el archivo CSV:', error);
+        });
+        </script>       
+    </body>
+</html>

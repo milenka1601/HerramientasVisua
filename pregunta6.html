@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>EJERCICIO NRO 5</title>
+        <script src="http://d3js.org/d3.v7.min.js"></script>
+        <script>
+            const csvUrl="https://raw.githubusercontent.com/milenka1601/HerramientasVisua/refs/heads/main/Real_Estate_Sales_2001-2022_GL.csv"
+            d3.csv(csvUrl).then(function(datos){
+            console.log("Arrancando el script dirc");
+              d3.select("body").append("h1").text("Ejercicio para cargar JSON");
+              var elementoUL = d3.select("body").append("ul");                
+              datos.forEach(function(d) {
+                  elementoUL.append("li").text(d.Ciudad);
+                  
+              })
+          });
+
+      </script>
+        <style>
+
+        </style>
+    </head>
+    <body>
+
+    </body>
+</html>
